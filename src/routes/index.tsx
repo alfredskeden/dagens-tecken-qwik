@@ -86,8 +86,7 @@ export default component$(() => {
     <WordSelectionButtons wordOfTheDay={wordOfTheDay} selectedId={selectedId} />
    )}
    <WordOfTheDayDescription
-    wordOfTheDay={wordOfTheDay}
-    selectedId={selectedId.value}
+    description={wordOfTheDay.value[selectedId.value].description}
    />
   </div>
  );
