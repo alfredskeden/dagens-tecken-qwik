@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model wordOfTheDay {
+  id            String        @id @default(uuid())
+  signId        String
+  word          String
+  description   String
+  movie         String
+  movie_image   String
+  dateCreated   String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @default(now())
+  similarDataId SimilarData[]
+}
+
+model SimilarData {
+  id             String       @id @default(uuid())
+  wordOfTheDay   wordOfTheDay @relation(fields: [wordOfTheDayId], references: [id])
+  wordOfTheDayId String
+  signId         String
+  word           String
+  description    String
+  movie          String
+  movie_image    String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now())
+}

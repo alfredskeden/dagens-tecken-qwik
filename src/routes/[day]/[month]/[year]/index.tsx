@@ -1,5 +1,6 @@
 import { component$, useSignal } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
+import { useLocation } from '@builder.io/qwik-city';
 import { Link } from '@builder.io/qwik-city';
 import { routeLoader$ } from '@builder.io/qwik-city';
 import type { SimilarData } from '@prisma/client';
@@ -11,10 +12,15 @@ import { prisma } from '~/utils/prisma';
 const dateFormat = 'DD/MM/YYYY';
 const apiString = 'https://tspquiz.se/api/';
 
-export const useTodaysWord = routeLoader$(async () => {
+export const useTodaysWord = routeLoader$(async (requestEvent) => {
+  const dateCreated = `${requestEvent.params.day}/${requestEvent.params.month}/${requestEvent.params.year}`;
+  if (dayjs(`${requestEvent.params.year}-${requestEvent.params.month}-${requestEvent.params.day}`).diff(dayjs()) > 0) {
+    return [];
+  }
+
   const word = await prisma.wordOfTheDay.findFirst({
     where: {
-      dateCreated: dayjs().format(dateFormat),
+      dateCreated,
     },
     include: {
       similarDataId: true,
@@ -29,7 +35,7 @@ export const useTodaysWord = routeLoader$(async () => {
 
     const createdWord = await prisma.wordOfTheDay.create({
       data: {
-        dateCreated: dayjs().format(dateFormat),
+        dateCreated,
         word,
         description,
         movie,
@@ -67,18 +73,34 @@ export const useTodaysWord = routeLoader$(async () => {
 export default component$(() => {
   const wordOfTheDay = useTodaysWord();
   const selectedId = useSignal(0);
+  const loc = useLocation();
 
-  if (wordOfTheDay.value.length <= 0) return <h2 class="text-3xl">Try again</h2>;
+  const currentDay = `${loc.params.year}-${loc.params.month}-${loc.params.day}`;
+
+  if (wordOfTheDay.value.length <= 0)
+    return (
+      <h2 class="text-3xl">
+        <Link class="underline hover:no-underline" href="/">
+          Try again
+        </Link>
+      </h2>
+    );
 
   return (
     <div class="flex flex-col justify-center items-center gap-4 px-4 md:p-0">
       <div class="flex items-center gap-10 mt-2">
         <div class="flex">
-          <Link class="underline hover:no-underline" href={`/${dayjs().subtract(1, 'day').format(dateFormat)}`}>
-            Föregående dag ({dayjs().subtract(1, 'day').format('DD/MM-YY')})
+          <Link class="underline" href={`/${dayjs(currentDay).subtract(1, 'day').format(dateFormat)}`}>
+            Föregående dag ({dayjs(currentDay).subtract(1, 'day').format('DD/MM-YY')})
           </Link>
         </div>
-        <span>Nästa dag ({dayjs().add(1, 'day').format('DD/MM-YY')})</span>
+        {dayjs(currentDay).add(1, 'day').diff(dayjs()) > 0 ? (
+          <span>Nästa dag ({dayjs(currentDay).add(1, 'day').format('DD/MM-YY')})</span>
+        ) : (
+          <Link class="underline" href={`/${dayjs(currentDay).add(1, 'day').format(dateFormat)}`}>
+            Nästa dag ({dayjs(currentDay).add(1, 'day').format('DD/MM-YY')})
+          </Link>
+        )}
       </div>
       <h2 class="text-3xl">{wordOfTheDay.value[selectedId.value].word.charAt(0).toUpperCase() + wordOfTheDay.value[selectedId.value].word.slice(1)}</h2>
       <video
