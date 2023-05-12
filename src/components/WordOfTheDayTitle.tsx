@@ -1,15 +1,11 @@
 import { component$ } from "@builder.io/qwik";
-import type { SimilarData } from "@prisma/client";
-import type { TSPQuizResponse } from "~/types/tspquiz";
 
 type Props = {
- wordOfTheDay: SimilarData | TSPQuizResponse;
+ word: string;
 };
 
-export default component$(({ wordOfTheDay }: Props) => {
+export default component$(({ word }: Props) => {
  return (
-  <h2 class="text-3xl">
-   {wordOfTheDay.word.charAt(0).toUpperCase() + wordOfTheDay.word.slice(1)}
-  </h2>
+  <h2 class="text-3xl">{word.charAt(0).toUpperCase() + word.slice(1)}</h2>
  );
 });

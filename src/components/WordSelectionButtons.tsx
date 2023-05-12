@@ -4,14 +4,14 @@ import type { SimilarData } from "@prisma/client";
 import PlayButton from "~/utils/icons/PlayButton";
 
 type Props = {
- wordOfTheDay: Readonly<Signal<SimilarData[]>>;
+ wordOfTheDay: SimilarData[];
  selectedId: Signal<number>;
 };
 
 export default component$(({ wordOfTheDay, selectedId }: Props) => {
  return (
   <div class="flex flex-wrap gap-4 justify-center">
-   {wordOfTheDay.value.map((wordOfTD: SimilarData, index: number) => {
+   {wordOfTheDay.map((wordOfTD: SimilarData, index: number) => {
     return (
      <button
       class={` ${

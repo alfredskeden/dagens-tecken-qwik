@@ -11,6 +11,7 @@ import WordOfTheDayDescription from "~/components/WordOfTheDayDescription";
 import WordOfTheDayTitle from "~/components/WordOfTheDayTitle";
 import WordSelectionButtons from "~/components/WordSelectionButtons";
 import type { TSPQuizResponse } from "~/types/tspquiz";
+import { futureData } from "~/utils/futureData";
 import { prisma } from "~/utils/prisma";
 
 export const apiString = "https://tspquiz.se/api/";
@@ -22,7 +23,7 @@ export const useTodaysWord = routeLoader$(async (requestEvent) => {
    `${requestEvent.params.year}-${requestEvent.params.month}-${requestEvent.params.day}`
   ).diff(dayjs()) > 0
  ) {
-  return [];
+  return [{ ...futureData }];
  }
 
  const word = await prisma.wordOfTheDay.findFirst({
@@ -98,11 +99,14 @@ export default component$(() => {
   <div class="flex flex-col justify-center items-center gap-4 px-4 md:p-0">
    <div class="flex flex-col justify-center items-center gap-4 px-4 md:p-0">
     <PreviousAndNextDayLinks />
-    <WordOfTheDayTitle wordOfTheDay={wordOfTheDay.value[selectedId.value]} />
-    <VideoPlayer wordOfTheDay={wordOfTheDay.value[selectedId.value]} />
+    <WordOfTheDayTitle word={wordOfTheDay.value[selectedId.value].word} />
+    <VideoPlayer
+     movie={wordOfTheDay.value[selectedId.value].movie}
+     movieImage={wordOfTheDay.value[selectedId.value].movie_image}
+    />
     {wordOfTheDay.value.length > 1 && (
      <WordSelectionButtons
-      wordOfTheDay={wordOfTheDay}
+      wordOfTheDay={wordOfTheDay.value}
       selectedId={selectedId}
      />
     )}

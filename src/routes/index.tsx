@@ -75,15 +75,27 @@ export default component$(() => {
  const wordOfTheDay = useTodaysWord();
  const selectedId = useSignal(0);
 
- if (wordOfTheDay.value.length <= 0) return <h2 class="text-3xl">Try again</h2>;
+ if (wordOfTheDay.value.length <= 0) {
+  return (
+   <div class="flex justify-center h-screen mt-4">
+    <h2 class="text-3xl">Try again</h2>
+   </div>
+  );
+ }
 
  return (
   <div class="flex flex-col justify-center items-center gap-4 px-4 md:p-0">
    <PreviousAndNextDayLinks />
-   <WordOfTheDayTitle wordOfTheDay={wordOfTheDay.value[selectedId.value]} />
-   <VideoPlayer wordOfTheDay={wordOfTheDay.value[selectedId.value]} />
+   <WordOfTheDayTitle word={wordOfTheDay.value[selectedId.value].word} />
+   <VideoPlayer
+    movieImage={wordOfTheDay.value[selectedId.value].movie_image}
+    movie={wordOfTheDay.value[selectedId.value].movie}
+   />
    {wordOfTheDay.value.length > 1 && (
-    <WordSelectionButtons wordOfTheDay={wordOfTheDay} selectedId={selectedId} />
+    <WordSelectionButtons
+     wordOfTheDay={wordOfTheDay.value}
+     selectedId={selectedId}
+    />
    )}
    <WordOfTheDayDescription
     description={wordOfTheDay.value[selectedId.value].description}
@@ -92,12 +104,19 @@ export default component$(() => {
  );
 });
 
-export const head: DocumentHead = {
- title: "Dagens Tecken",
- meta: [
-  {
-   name: "description",
-   content: "Dagens teckenspråk tecken",
-  },
- ],
+export const head: DocumentHead = ({ resolveValue }) => {
+ const word = resolveValue(useTodaysWord);
+ return {
+  title: `Dagens Tecken "${word[0].word}"`,
+  meta: [
+   {
+    name: "description",
+    content: word[0].description,
+   },
+   {
+    name: "id",
+    content: word[0].id,
+   },
+  ],
+ };
 };

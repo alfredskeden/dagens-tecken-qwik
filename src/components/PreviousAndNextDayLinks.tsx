@@ -18,7 +18,8 @@ export default component$(() => {
      Föregående dag ({dayjs(currentDay).subtract(1, "day").format("DD/MM-YY")})
     </Link>
    </div>
-   {loc.url.pathname === "/" || dayjs().format("YYYY-MM-DD") === paramsDate ? (
+   {loc.url.pathname === "/" ||
+   dayjs(paramsDate).add(1, "day").diff(dayjs()) > 0 ? (
     <span>
      Nästa dag ({dayjs(currentDay).add(1, "day").format("DD/MM-YY")})
     </span>
