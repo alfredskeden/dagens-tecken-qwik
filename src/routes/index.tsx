@@ -3,11 +3,11 @@ import type { DocumentHead } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import type { SimilarData } from "@prisma/client";
 import dayjs from "dayjs";
-import PreviousAndNextDayLinks from "~/components/components/PreviousAndNextDayLinks";
-import VideoPlayer from "~/components/components/VideoPlayer";
-import WordOfTheDayDescription from "~/components/components/WordOfTheDayDescription";
-import WordOfTheDayTitle from "~/components/components/WordOfTheDayTitle";
-import WordSelectionButtons from "~/components/components/WordSelectionButtons";
+import PreviousAndNextDayLinks from "~/components/PreviousAndNextDayLinks";
+import VideoPlayer from "~/components/VideoPlayer";
+import WordOfTheDayDescription from "~/components/WordOfTheDayDescription";
+import WordOfTheDayTitle from "~/components/WordOfTheDayTitle";
+import WordSelectionButtons from "~/components/WordSelectionButtons";
 import type { TSPQuizResponse } from "~/types/tspquiz";
 import { prisma } from "~/utils/prisma";
 
@@ -80,11 +80,8 @@ export default component$(() => {
  return (
   <div class="flex flex-col justify-center items-center gap-4 px-4 md:p-0">
    <PreviousAndNextDayLinks />
-   <WordOfTheDayTitle
-    wordOfTheDay={wordOfTheDay}
-    selectedId={selectedId.value}
-   />
-   <VideoPlayer wordOfTheDay={wordOfTheDay} selectedId={selectedId.value} />
+   <WordOfTheDayTitle wordOfTheDay={wordOfTheDay.value[selectedId.value]} />
+   <VideoPlayer wordOfTheDay={wordOfTheDay.value[selectedId.value]} />
    {wordOfTheDay.value.length > 1 && (
     <WordSelectionButtons wordOfTheDay={wordOfTheDay} selectedId={selectedId} />
    )}
