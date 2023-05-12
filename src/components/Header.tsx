@@ -10,13 +10,13 @@ export default component$(() => {
 
  return (
   <header class="bg-gray-800 text-white">
-   <div class="container mx-auto px-4 py-6 flex justify-between items-center">
-    <h1 class="flex text-4xl font-bold align-middle mb-0">
-     <Link href="/" class=" text-white">
+   <div class="container mx-auto px-4 py-6 flex flex-col sm:flex-row justify-between items-center">
+    <h1 class="flex text-4xl font-bold align-middle mb-2 sm:mb-0">
+     <Link href="/" class="text-white">
       Dagens Tecken!
      </Link>
     </h1>
-    <div class="flex items-center">
+    <div class="flex items-center mt-4 sm:mt-0">
      <input
       value={search.term}
       onInput$={(ev) => (search.term = (ev.target as HTMLInputElement).value)}
@@ -27,7 +27,7 @@ export default component$(() => {
       }}
       type="text"
       placeholder="Search"
-      class="bg-gray-700 text-white rounded-full py-2 px-4 focus:outline-none"
+      class="bg-gray-700 text-white rounded-full py-2 px-4 focus:outline-none sm:mb-0"
      />
      <button
       class="bg-gray-600 text-white rounded-full py-2 px-4 ml-2"
