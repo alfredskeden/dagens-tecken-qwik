@@ -26,8 +26,6 @@
   "@prisma/client": "4.13.0",
   "@types/eslint": "8.37.0",
   "@types/node": "^20.1.0",
-  "@types/react": "18.2.5",
-  "@types/react-dom": "18.2.4",
   "@typescript-eslint/eslint-plugin": "5.59.2",
   "@typescript-eslint/parser": "5.59.2",
   "autoprefixer": "^10.4.14",

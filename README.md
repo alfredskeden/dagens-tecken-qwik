@@ -1,3 +1,18 @@
+# Dagens Tecken!
+
+Production hosted at: https://dagens-tecken.singlesmtg.com/
+
+Uses the api found at (don't know if I can tho :): https://tspquiz.se/
+Videos found at https://teckensprakslexikon.su.se/
+
+### Technologies
+
+Qwik (City)
+
+Prisma
+
+Tailwind
+
 # Qwik City App ⚡️
 
 - [Qwik Docs](https://qwik.builder.io/)
