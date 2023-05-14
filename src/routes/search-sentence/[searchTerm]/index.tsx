@@ -78,6 +78,7 @@ export default component$(() => {
               movieImage={sentenceWords[currentPlayingId.value].movie_image}
               movie={sentenceWords[currentPlayingId.value].movie}
               loop={false}
+              controls={false}
               onEnded={
                 currentPlayingId.value + 1 != sentenceWords.length ? movieEnded : resetSelectedId
               }
