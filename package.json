@@ -16,7 +16,8 @@
   "fmt": "prettier --write .",
   "fmt.check": "prettier --check .",
   "lint": "eslint \"src/**/*.ts*\"",
-  "preview": "qwik build preview && vite preview --port 3579",
+  "build:prod": "qwik build preview && pm2 restart 11",
+  "preview": "vite preview --port 3579",
   "start": "vite --open --mode ssr",
   "qwik": "qwik"
  },
