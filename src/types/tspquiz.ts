@@ -2,6 +2,12 @@ type Category = {
   id: number;
 };
 
+type Phrase = {
+  movie: string;
+  movie_image: string;
+  phrase: string;
+};
+
 export type TSPQuizResponse = {
   id: string;
   word: string;
@@ -26,6 +32,6 @@ export type TSPQuizResponse = {
   genuine: number;
   also_means: string;
   hidden_also_means: string;
-  phrases: any[]; // Specify the type of phrases if available
+  phrases: Phrase[];
   categories: Category[];
 };
