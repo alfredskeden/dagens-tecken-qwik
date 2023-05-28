@@ -1,40 +1,38 @@
-import { Resource, component$, useResource$, $, useSignal } from '@builder.io/qwik';
+import { Resource, component$, $, useSignal } from '@builder.io/qwik';
 import type { DocumentHead } from '@builder.io/qwik-city';
-import { useLocation } from '@builder.io/qwik-city';
+import { routeLoader$ } from '@builder.io/qwik-city';
 import Loading from '~/components/Loading';
 import { VideoPlayerNL } from '~/components/VideoPlayer';
 import WordOfTheDayTitle from '~/components/WordOfTheDayTitle';
 import { apiString } from '~/routes';
 import type { TSPQuizResponse } from '~/types/tspquiz';
 
-export default component$(() => {
-  const loc = useLocation();
-  const currentPlayingId = useSignal(0);
+export const useSentenceBuilder = routeLoader$(async ({ params }) => {
+  const searchString = decodeURI(params.searchTerm);
 
-  const sentence = useResource$<TSPQuizResponse[]>(async ({ track }) => {
-    track(() => loc.params.searchTerm);
+  const splitSearchTerm = searchString.split(' ');
 
-    const searchString = decodeURI(loc.params.searchTerm);
+  const sentenceArray: TSPQuizResponse[] = [];
 
-    const splitSearchTerm = searchString.split(' ');
+  for (const searchWords of splitSearchTerm) {
+    const res2 = await fetch(
+      `${apiString}?action=all-by-word&word=${encodeURI(
+        searchWords
+      )}&flexible_match=0&max_count=1&excludeUncommon=0`
+    );
+    const words: TSPQuizResponse[] = await res2.json();
 
-    const sentenceArray: TSPQuizResponse[] = [];
-
-    for (const searchWords of splitSearchTerm) {
-      const res2 = await fetch(
-        `${apiString}?action=all-by-word&word=${encodeURI(
-          searchWords
-        )}&flexible_match=0&max_count=1&excludeUncommon=0`
-      );
-      const words: TSPQuizResponse[] = await res2.json();
-
-      if (words.length > 0) {
-        sentenceArray.push(words[0]);
-      }
+    if (words.length > 0) {
+      sentenceArray.push(words[0]);
     }
+  }
 
-    return sentenceArray;
-  });
+  return sentenceArray;
+});
+
+export default component$(() => {
+  const currentPlayingId = useSignal(0);
+  const sentence = useSentenceBuilder();
 
   const movieEnded = $(() => {
     currentPlayingId.value++;
@@ -66,7 +64,7 @@ export default component$(() => {
                 }
                 return (
                   <WordOfTheDayTitle
-                    key={sentenceWord.id}
+                    key={`${sentenceWord.id}-${index}`}
                     word={sentenceWord.word}
                     signId={sentenceWord.id}
                     underline={index === currentPlayingId.value}

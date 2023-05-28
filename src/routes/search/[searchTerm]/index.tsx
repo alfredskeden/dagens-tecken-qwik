@@ -29,6 +29,10 @@ export default component$(() => {
     return words;
   });
 
+  if (loc.isNavigating) {
+    return <Loading />;
+  }
+
   return (
     <Resource
       value={words}
