@@ -26,7 +26,7 @@ export default component$(() => {
     <script
      async
      type="text/partytown"
-     src="https://www.googletagmanager.com/gtag/js?id=G-MQPN56WJXQ"
+     src="https://www.googletagmanager.com/gtag/js?id=G-NN34QFDQJV"
     />
     <RouterHead />
    </head>
