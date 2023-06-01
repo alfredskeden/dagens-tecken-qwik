@@ -7,28 +7,27 @@ export default component$(() => {
  const loc = useLocation();
  const paramsDate = `${loc.params.year}-${loc.params.month}-${loc.params.day}`;
  const currentDay = loc.url.pathname === "/" ? dayjs() : paramsDate;
+ const previousDay = dayjs(currentDay).subtract(1, "day");
+ const nextDay = dayjs(currentDay).add(1, "day");
 
  return (
   <div class="flex items-center gap-10 mt-2">
    <div class="flex">
     <Link
      class="underline hover:no-underline"
-     href={`/${dayjs(currentDay).subtract(1, "day").format(dateFormat)}`}
+     href={`/${previousDay.format(dateFormat)}`}
     >
-     Föregående dag ({dayjs(currentDay).subtract(1, "day").format("DD/MM-YY")})
+     Föregående dag ({previousDay.format("DD/MM-YY")})
     </Link>
    </div>
-   {loc.url.pathname === "/" ||
-   dayjs(paramsDate).add(1, "day").diff(dayjs()) > 0 ? (
-    <span>
-     Nästa dag ({dayjs(currentDay).add(1, "day").format("DD/MM-YY")})
-    </span>
+   {loc.url.pathname === "/" || nextDay.diff(dayjs()) > 0 ? (
+    <span>Nästa dag ({nextDay.format("DD/MM-YY")})</span>
    ) : (
     <Link
      class="underline hover:no-underline"
-     href={`/${dayjs(currentDay).add(1, "day").format(dateFormat)}`}
+     href={`/${nextDay.format(dateFormat)}`}
     >
-     Nästa dag ({dayjs(currentDay).add(1, "day").format("DD/MM-YY")})
+     Nästa dag ({nextDay.format("DD/MM-YY")})
     </Link>
    )}
   </div>
