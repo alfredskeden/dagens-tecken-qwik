@@ -24,30 +24,30 @@
   "qwik": "qwik"
  },
  "devDependencies": {
-  "@builder.io/qwik": "^1.1.4",
-  "@builder.io/qwik-city": "^1.1.4",
-  "@fastify/compress": "^6.2.1",
-  "@fastify/static": "^6.10.1",
-  "@prisma/client": "4.15.0",
-  "@types/eslint": "8.40.0",
-  "@types/node": "^20.2.5",
-  "@typescript-eslint/eslint-plugin": "5.59.8",
-  "@typescript-eslint/parser": "5.59.8",
+  "@builder.io/qwik": "^1.2.3",
+  "@builder.io/qwik-city": "^1.2.3",
+  "@fastify/compress": "^6.4.0",
+  "@fastify/static": "^6.10.2",
+  "@prisma/client": "4.16.2",
+  "@types/eslint": "8.40.2",
+  "@types/node": "^20.3.3",
+  "@typescript-eslint/eslint-plugin": "5.60.1",
+  "@typescript-eslint/parser": "5.60.1",
   "autoprefixer": "^10.4.14",
-  "eslint": "8.41.0",
-  "eslint-plugin-qwik": "^1.1.4",
-  "fastify": "^4.17.0",
+  "eslint": "8.44.0",
+  "eslint-plugin-qwik": "^1.2.3",
+  "fastify": "^4.19.1",
   "fastify-plugin": "^4.5.0",
   "postcss": "^8.4.24",
   "prettier": "2.8.8",
-  "prisma": "^4.15.0",
+  "prisma": "^4.16.2",
   "tailwindcss": "^3.3.2",
-  "typescript": "5.0.4",
+  "typescript": "5.1.6",
   "undici": "5.22.1",
   "vite": "4.3.9",
   "vite-tsconfig-paths": "4.2.0"
  },
  "dependencies": {
-  "dayjs": "^1.11.7"
+  "dayjs": "^1.11.9"
  }
 }
