@@ -26,7 +26,9 @@ export const useTodaysWord = routeLoader$(async () => {
  });
 
  if (!word) {
-  const res1 = await fetch(`${apiString}?action=random&count=1`);
+  const res1 = await fetch(
+   `${apiString}?action=random&count=1&excludeUncommon=1`
+  );
   const randomWord: TSPQuizResponse[] = await res1.json();
 
   const { id, word, description, movie, movie_image } = randomWord[0];
