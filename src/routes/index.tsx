@@ -47,7 +47,7 @@ export const useTodaysWord = routeLoader$(async () => {
   const res2 = await fetch(
    `${apiString}?action=all-by-word&word=${encodeURI(
     createdWord.word
-   )}&flexible_match=1&max_count=30&excludeUncommon=0`
+   )}&flexible_match=1&max_count=30&excludeUncommon=1`
   );
   const similarWords: TSPQuizResponse[] = await res2.json();
 
