@@ -1,24 +1,24 @@
-import { Resource, component$, $, useSignal } from '@builder.io/qwik';
-import type { DocumentHead } from '@builder.io/qwik-city';
-import { routeLoader$ } from '@builder.io/qwik-city';
-import Loading from '~/components/Loading';
-import { VideoPlayerNL } from '~/components/VideoPlayer';
-import WordOfTheDayTitle from '~/components/WordOfTheDayTitle';
-import { apiString } from '~/routes';
-import type { TSPQuizResponse } from '~/types/tspquiz';
+import { Resource, component$, $, useSignal } from "@builder.io/qwik";
+import type { DocumentHead } from "@builder.io/qwik-city";
+import { routeLoader$ } from "@builder.io/qwik-city";
+import Loading from "~/components/Loading";
+import { VideoPlayerNL } from "~/components/VideoPlayer";
+import WordOfTheDayTitle from "~/components/WordOfTheDayTitle";
+import { apiString } from "~/routes";
+import type { TSPQuizResponse } from "~/types/tspquiz";
 
 export const useSentenceBuilder = routeLoader$(async ({ params }) => {
   const searchString = decodeURI(params.searchTerm);
 
-  const splitSearchTerm = searchString.split(' ');
+  const splitSearchTerm = searchString.split(" ");
 
   const sentenceArray: TSPQuizResponse[] = [];
 
   for (const searchWords of splitSearchTerm) {
     const res2 = await fetch(
       `${apiString}?action=all-by-word&word=${encodeURI(
-        searchWords
-      )}&flexible_match=0&max_count=1&excludeUncommon=0`
+        searchWords,
+      )}&flexible_match=0&max_count=1&excludeUncommon=0`,
     );
     const words: TSPQuizResponse[] = await res2.json();
 
@@ -78,7 +78,9 @@ export default component$(() => {
               loop={false}
               controls={false}
               onEnded={
-                currentPlayingId.value + 1 != sentenceWords.length ? movieEnded : resetSelectedId
+                currentPlayingId.value + 1 != sentenceWords.length
+                  ? movieEnded
+                  : resetSelectedId
               }
             />
           </div>

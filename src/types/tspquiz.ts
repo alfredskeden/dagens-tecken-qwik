@@ -20,7 +20,7 @@ export type TSPQuizResponse = {
   frequency: null | string;
   type: null | string;
   region: null | string;
-  hand_type: 'one' | 'two' | 'unknown';
+  hand_type: "one" | "two" | "unknown";
   right_handform: string;
   right_position: string;
   right_attitude: string;

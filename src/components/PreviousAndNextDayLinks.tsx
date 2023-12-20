@@ -4,32 +4,32 @@ import dayjs from "dayjs";
 import { dateFormat } from "~/routes";
 
 export default component$(() => {
- const loc = useLocation();
- const paramsDate = `${loc.params.year}-${loc.params.month}-${loc.params.day}`;
- const currentDay = loc.url.pathname === "/" ? dayjs() : paramsDate;
- const previousDay = dayjs(currentDay).subtract(1, "day");
- const nextDay = dayjs(currentDay).add(1, "day");
+  const loc = useLocation();
+  const paramsDate = `${loc.params.year}-${loc.params.month}-${loc.params.day}`;
+  const currentDay = loc.url.pathname === "/" ? dayjs() : paramsDate;
+  const previousDay = dayjs(currentDay).subtract(1, "day");
+  const nextDay = dayjs(currentDay).add(1, "day");
 
- return (
-  <div class="flex items-center gap-10 mt-2">
-   <div class="flex">
-    <Link
-     class="underline hover:no-underline"
-     href={`/${previousDay.format(dateFormat)}`}
-    >
-     Föregående dag ({previousDay.format("DD/MM-YY")})
-    </Link>
-   </div>
-   {loc.url.pathname === "/" || nextDay.diff(dayjs()) > 0 ? (
-    <span>Nästa dag ({nextDay.format("DD/MM-YY")})</span>
-   ) : (
-    <Link
-     class="underline hover:no-underline"
-     href={`/${nextDay.format(dateFormat)}`}
-    >
-     Nästa dag ({nextDay.format("DD/MM-YY")})
-    </Link>
-   )}
-  </div>
- );
+  return (
+    <div class="flex items-center gap-10 mt-2">
+      <div class="flex">
+        <Link
+          class="underline hover:no-underline"
+          href={`/${previousDay.format(dateFormat)}`}
+        >
+          Föregående dag ({previousDay.format("DD/MM-YY")})
+        </Link>
+      </div>
+      {loc.url.pathname === "/" || nextDay.diff(dayjs()) > 0 ? (
+        <span>Nästa dag ({nextDay.format("DD/MM-YY")})</span>
+      ) : (
+        <Link
+          class="underline hover:no-underline"
+          href={`/${nextDay.format(dateFormat)}`}
+        >
+          Nästa dag ({nextDay.format("DD/MM-YY")})
+        </Link>
+      )}
+    </div>
+  );
 });

@@ -1,5 +1,5 @@
-import type { QRL } from '@builder.io/qwik';
-import { component$ } from '@builder.io/qwik';
+import type { QRL } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 
 type Props = {
   movieImage: string;
@@ -9,7 +9,7 @@ type Props = {
   onEnded?: QRL<() => void>;
 };
 
-export const teckenSprakUrl = 'https://teckensprakslexikon.su.se/';
+export const teckenSprakUrl = "https://teckensprakslexikon.su.se/";
 
 export const VideoPlayerNL = ({
   movieImage,
@@ -23,7 +23,7 @@ export const VideoPlayerNL = ({
       class="rounded-lg"
       poster={`${teckenSprakUrl}${movieImage}`}
       src={`${teckenSprakUrl}${movie}`}
-      autoPlay
+      autoplay
       width="560"
       muted
       loop={loop}

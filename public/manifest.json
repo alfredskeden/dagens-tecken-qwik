@@ -8,11 +8,11 @@
   "background_color": "#fff",
   "description": "Sök och lär dig teckenspråk med hjälp av denna snabba app.",
   "icons": [
-		{
-			"src": "logo-192-192.png",
-			"sizes": "192x192",
-			"type": "image/png",
-			"purpose": "any maskable"
-		}
-	]
+    {
+      "src": "logo-192-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
