@@ -1,7 +1,9 @@
-import { component$, Slot } from "@builder.io/qwik";
-import { routeLoader$ } from "@builder.io/qwik-city";
-import Footer from "~/components/Footer";
-import Header from "~/components/Header";
+import type { Signal } from '@builder.io/qwik';
+import { component$, createContextId, Slot, useContextProvider, useSignal } from '@builder.io/qwik';
+import { routeLoader$ } from '@builder.io/qwik-city';
+import Footer from '~/components/Footer';
+import Header from '~/components/Header';
+import { useLocalStorage } from '~/hooks/useLocalStorage';
 
 export const useServerTimeLoader = routeLoader$(() => {
   return {
@@ -9,7 +11,14 @@ export const useServerTimeLoader = routeLoader$(() => {
   };
 });
 
+export const LocalStorageNameContext = createContextId<Signal<string>>('localeStorageName');
+export const nameSignalContext = createContextId<Signal<string>>('nameSignalName');
+
 export default component$(() => {
+  const testSingaL = useSignal('');
+  useContextProvider(LocalStorageNameContext, useLocalStorage(testSingaL, 'name'));
+  useContextProvider(nameSignalContext, testSingaL);
+
   return (
     <>
       <Header />

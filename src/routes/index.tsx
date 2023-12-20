@@ -1,19 +1,19 @@
-import { component$, useSignal } from "@builder.io/qwik";
-import type { DocumentHead } from "@builder.io/qwik-city";
-import { useLocation } from "@builder.io/qwik-city";
-import { routeLoader$ } from "@builder.io/qwik-city";
-import type { SimilarData } from "@prisma/client";
-import dayjs from "dayjs";
-import PreviousAndNextDayLinks from "~/components/PreviousAndNextDayLinks";
-import VideoPlayer from "~/components/VideoPlayer";
-import WordOfTheDayDescription from "~/components/WordOfTheDayDescription";
-import WordOfTheDayTitle from "~/components/WordOfTheDayTitle";
-import WordSelectionButtons from "~/components/WordSelectionButtons";
-import type { TSPQuizResponse } from "~/types/tspquiz";
-import { prisma } from "~/utils/prisma";
+import { component$, useSignal } from '@builder.io/qwik';
+import type { DocumentHead } from '@builder.io/qwik-city';
+import { useLocation } from '@builder.io/qwik-city';
+import { routeLoader$ } from '@builder.io/qwik-city';
+import type { SimilarData } from '@prisma/client';
+import dayjs from 'dayjs';
+import PreviousAndNextDayLinks from '~/components/PreviousAndNextDayLinks';
+import VideoPlayer from '~/components/VideoPlayer';
+import WordOfTheDayDescription from '~/components/WordOfTheDayDescription';
+import WordOfTheDayTitle from '~/components/WordOfTheDayTitle';
+import WordSelectionButtons from '~/components/WordSelectionButtons';
+import type { TSPQuizResponse } from '~/types/tspquiz';
+import { prisma } from '~/utils/prisma';
 
-export const dateFormat = "DD/MM/YYYY";
-export const apiString = "https://tspquiz.se/api/";
+export const dateFormat = 'DD/MM/YYYY';
+export const apiString = 'https://tspquiz.se/api/';
 
 export const useTodaysWord = routeLoader$(async () => {
   const word = await prisma.wordOfTheDay.findFirst({
@@ -26,9 +26,7 @@ export const useTodaysWord = routeLoader$(async () => {
   });
 
   if (!word) {
-    const res1 = await fetch(
-      `${apiString}?action=random&count=1&excludeUncommon=1`,
-    );
+    const res1 = await fetch(`${apiString}?action=random&count=1&excludeUncommon=1`);
     const randomWord: TSPQuizResponse[] = await res1.json();
 
     const { id, word, description, movie, movie_image } = randomWord[0];
@@ -46,8 +44,8 @@ export const useTodaysWord = routeLoader$(async () => {
 
     const res2 = await fetch(
       `${apiString}?action=all-by-word&word=${encodeURI(
-        createdWord.word,
-      )}&flexible_match=1&max_count=30&excludeUncommon=1`,
+        createdWord.word
+      )}&flexible_match=1&max_count=30&excludeUncommon=1`
     );
     const similarWords: TSPQuizResponse[] = await res2.json();
 
@@ -101,14 +99,9 @@ export default component$(() => {
         movie={wordOfTheDay.value[selectedId.value].movie}
       />
       {wordOfTheDay.value.length > 1 && (
-        <WordSelectionButtons
-          wordOfTheDay={wordOfTheDay.value}
-          selectedId={selectedId}
-        />
+        <WordSelectionButtons wordOfTheDay={wordOfTheDay.value} selectedId={selectedId} />
       )}
-      <WordOfTheDayDescription
-        description={wordOfTheDay.value[selectedId.value].description}
-      />
+      <WordOfTheDayDescription description={wordOfTheDay.value[selectedId.value].description} />
     </div>
   );
 });
@@ -119,11 +112,11 @@ export const head: DocumentHead = ({ resolveValue }) => {
     title: `Dagens Tecken "${word[0].word}"`,
     meta: [
       {
-        name: "description",
+        name: 'description',
         content: word[0].description,
       },
       {
-        name: "id",
+        name: 'id',
         content: word[0].id,
       },
     ],
