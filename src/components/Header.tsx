@@ -1,10 +1,10 @@
-import { component$, useContext, useStore } from '@builder.io/qwik';
-import { Link, useNavigate } from '@builder.io/qwik-city';
-import { LocalStorageNameContext } from '~/routes/layout';
+import { component$, useContext, useStore } from "@builder.io/qwik";
+import { Link, useNavigate } from "@builder.io/qwik-city";
+import { LocalStorageNameContext } from "~/routes/layout";
 
 export default component$(() => {
   const search = useStore({
-    term: '',
+    term: "",
   });
   const storedName = useContext(LocalStorageNameContext);
 
@@ -18,13 +18,15 @@ export default component$(() => {
             Dagens tecken
           </Link>
         </h1>
-        <div class="flex space-x-2">
-          <div class="flex items-center mt-4 sm:mt-0">
+        <div class="flex space-x-2 mt-2 sm:mt-0">
+          <div class="flex items-center">
             <input
               value={search.term}
-              onInput$={(ev) => (search.term = (ev.target as HTMLInputElement).value)}
+              onInput$={(ev) =>
+                (search.term = (ev.target as HTMLInputElement).value)
+              }
               onKeyPress$={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === "Enter") {
                   nav(`/search/${encodeURI(search.term)}`);
                 }
               }}
@@ -38,9 +40,12 @@ export default component$(() => {
               Sök
             </button>
           </div>
-          <div>
-            <Link class="bg-gray-600 text-white rounded-full py-2 px-4 ml-2" href="/sign-in">
-              {!storedName.value ? 'Sign in' : 'Sign out'}
+          <div class="flex items-center">
+            <Link
+              class="bg-gray-600 text-white rounded-full py-2 px-4"
+              href="/sign-in"
+            >
+              {!storedName.value ? "Sign in" : "Sign out"}
             </Link>
           </div>
         </div>
