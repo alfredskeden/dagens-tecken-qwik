@@ -23,7 +23,7 @@ export const VideoPlayerNL = ({
       class="rounded-lg"
       poster={`${teckenSprakUrl}${movieImage}`}
       src={`${teckenSprakUrl}${movie}`}
-      autoPlay
+      autoplay
       width="560"
       muted
       loop={loop}
