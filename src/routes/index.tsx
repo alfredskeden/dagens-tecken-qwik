@@ -186,37 +186,36 @@ export default component$(() => {
           description={wordOfTheDay.value[selectedId.value].description}
         />
       )}
-      {(guessWord.value !== undefined && guessWord.value.length === 0) ||
-        (!isNameInGuessedArray && (
-          <div class="flex flex-col">
-            <div class="flex items-center">
-              <input
-                value={userGuess.value}
-                onInput$={(ev) =>
-                  (userGuess.value = (ev.target as HTMLInputElement).value)
+      {!isNameInGuessedArray && (
+        <div class="flex flex-col">
+          <div class="flex items-center">
+            <input
+              value={userGuess.value}
+              onInput$={(ev) =>
+                (userGuess.value = (ev.target as HTMLInputElement).value)
+              }
+              onKeyPress$={(e) => {
+                if (e.key === "Enter") {
+                  userGuessesWord((e.target as HTMLInputElement).value);
                 }
-                onKeyPress$={(e) => {
-                  if (e.key === "Enter") {
-                    userGuessesWord((e.target as HTMLInputElement).value);
-                  }
-                }}
-                type="text"
-                class="bg-gray-700 text-white rounded-full py-2 px-4 focus:outline-none sm:mb-0"
-              />
-              <button
-                class="bg-gray-600 text-white rounded-full py-2 px-4 ml-2"
-                onClick$={() => userGuessesWord(userGuess.value)}
-              >
-                Gissa
-              </button>
-            </div>
-            {guessedWrong.value && (
-              <div class="flex items-center">
-                <span class="text-red-700">Fel gissat</span>
-              </div>
-            )}
+              }}
+              type="text"
+              class="bg-gray-700 text-white rounded-full py-2 px-4 focus:outline-none sm:mb-0"
+            />
+            <button
+              class="bg-gray-600 text-white rounded-full py-2 px-4 ml-2"
+              onClick$={() => userGuessesWord(userGuess.value)}
+            >
+              Gissa
+            </button>
           </div>
-        ))}
+          {guessedWrong.value && (
+            <div class="flex items-center">
+              <span class="text-red-700">Fel gissat</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 });
