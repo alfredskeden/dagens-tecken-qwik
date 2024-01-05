@@ -1,0 +1,9 @@
+-- CreateTable
+CREATE TABLE "GuessWord" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "wordOfTheDayId" TEXT NOT NULL,
+    "solvedBy" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "GuessWord_wordOfTheDayId_fkey" FOREIGN KEY ("wordOfTheDayId") REFERENCES "wordOfTheDay" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);

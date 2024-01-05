@@ -29,6 +29,12 @@ export default component$(() => {
             teckenspråkslexikon
           </Link>
         </span>
+        <Link
+          href="/leaderboard"
+          class="text-gray-800 font-semibold hover:text-purple-600"
+        >
+          Leaderboard
+        </Link>
       </div>
     </footer>
   );

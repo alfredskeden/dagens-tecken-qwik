@@ -17,11 +17,14 @@ export default component$(() => {
     localStorage.removeItem("name");
     currentName.value = "";
     inputValue.value = "";
+    nameInStorage.localStorageName.value = "";
   });
+
+  if (!nameInStorage.initialLoad.value) return <></>;
 
   return (
     <div class="flex justify-center mt-4">
-      {!nameInStorage.value ? (
+      {!nameInStorage.localStorageName.value ? (
         <div class="flex space-x-2">
           <input
             value={inputValue.value}
@@ -44,8 +47,10 @@ export default component$(() => {
           </button>
         </div>
       ) : (
-        <div class="flex space-x-2 text-center align-middle">
-          <span class="text-xl">{nameInStorage.value}</span>
+        <div class="flex space-x-2">
+          <span class="inline-block align-baseline text-3xl">
+            {nameInStorage.localStorageName.value}
+          </span>
           <button
             class="bg-gray-600 text-white rounded-full py-2 px-4"
             onClick$={clearNamedStorage}

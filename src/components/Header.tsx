@@ -1,11 +1,9 @@
-import { component$, useContext, useStore } from "@builder.io/qwik";
+import { component$, useContext, useSignal } from "@builder.io/qwik";
 import { Link, useNavigate } from "@builder.io/qwik-city";
 import { LocalStorageNameContext } from "~/routes/layout";
 
 export default component$(() => {
-  const search = useStore({
-    term: "",
-  });
+  const search = useSignal("");
   const storedName = useContext(LocalStorageNameContext);
 
   const nav = useNavigate();
@@ -18,16 +16,16 @@ export default component$(() => {
             Dagens tecken
           </Link>
         </h1>
-        <div class="flex space-x-2 mt-2 sm:mt-0">
-          <div class="flex items-center">
+        <div class="flex flex-col sm:flex-row space-x-2 mt-2 sm:mt-0 items-center">
+          <div class="flex flex-row items-center">
             <input
-              value={search.term}
+              value={search.value}
               onInput$={(ev) =>
-                (search.term = (ev.target as HTMLInputElement).value)
+                (search.value = (ev.target as HTMLInputElement).value)
               }
               onKeyPress$={(e) => {
                 if (e.key === "Enter") {
-                  nav(`/search/${encodeURI(search.term)}`);
+                  nav(`/search/${encodeURI(search.value)}`);
                 }
               }}
               type="text"
@@ -35,17 +33,17 @@ export default component$(() => {
             />
             <button
               class="bg-gray-600 text-white rounded-full py-2 px-4 ml-2"
-              onClick$={() => nav(`/search/${encodeURI(search.term)}`)}
+              onClick$={() => nav(`/search/${encodeURI(search.value)}`)}
             >
               Sök
             </button>
           </div>
-          <div class="flex items-center">
+          <div class="flex items-center mt-2 sm:mt-0">
             <Link
-              class="bg-gray-600 text-white rounded-full py-2 px-4"
+              class="bg-gray-600 text-white rounded-full py-2 px-4 text-center"
               href="/sign-in"
             >
-              {!storedName.value ? "Sign in" : "Sign out"}
+              {!storedName.localStorageName.value ? "Logga in" : "Logga ut"}
             </Link>
           </div>
         </div>

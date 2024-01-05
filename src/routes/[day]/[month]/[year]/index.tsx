@@ -20,7 +20,7 @@ export const useTodaysWord = routeLoader$(async (requestEvent) => {
   const dateCreated = `${requestEvent.params.day}/${requestEvent.params.month}/${requestEvent.params.year}`;
   if (
     dayjs(
-      `${requestEvent.params.year}-${requestEvent.params.month}-${requestEvent.params.day}`,
+      `${requestEvent.params.year}-${requestEvent.params.month}-${requestEvent.params.day}`
     ).diff(dayjs()) > 0
   ) {
     return [{ ...futureData }];
@@ -54,8 +54,8 @@ export const useTodaysWord = routeLoader$(async (requestEvent) => {
 
     const res2 = await fetch(
       `${apiString}?action=all-by-word&word=${encodeURI(
-        createdWord.word,
-      )}&flexible_match=1&max_count=30&excludeUncommon=0`,
+        createdWord.word
+      )}&flexible_match=1&max_count=30&excludeUncommon=0`
     );
     const similarWords: TSPQuizResponse[] = await res2.json();
 
@@ -124,12 +124,20 @@ export default component$(() => {
   );
 });
 
-export const head: DocumentHead = {
-  title: "Dagens Tecken",
-  meta: [
-    {
-      name: "description",
-      content: "Dagens teckenspråk tecken",
-    },
-  ],
+export const head: DocumentHead = ({ resolveValue }) => {
+  const word = resolveValue(useTodaysWord);
+
+  return {
+    title: `Dagens Tecken "${word[0].word}"`,
+    meta: [
+      {
+        name: "description",
+        content: word[0].description,
+      },
+      {
+        name: "id",
+        content: word[0].id,
+      },
+    ],
+  };
 };

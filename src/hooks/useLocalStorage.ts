@@ -1,14 +1,16 @@
-import type { Signal } from '@builder.io/qwik';
-import { useSignal, useVisibleTask$ } from '@builder.io/qwik';
+import type { Signal } from "@builder.io/qwik";
+import { useSignal, useVisibleTask$ } from "@builder.io/qwik";
 
 export function useLocalStorage(signal: Signal, storeName: string) {
-  const nameStore = useSignal<string | null>('');
+  const localStorageName = useSignal<string | null>(null);
+  const initialLoad = useSignal<boolean>(false);
 
   // eslint-disable-next-line qwik/no-use-visible-task
   useVisibleTask$(({ track }) => {
     track(() => signal.value);
-    nameStore.value = localStorage.getItem(storeName);
+    localStorageName.value = localStorage.getItem(storeName);
+    initialLoad.value = true;
   });
 
-  return nameStore;
+  return { initialLoad, localStorageName };
 }

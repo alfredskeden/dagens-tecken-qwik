@@ -1,9 +1,19 @@
-import type { Signal } from '@builder.io/qwik';
-import { component$, createContextId, Slot, useContextProvider, useSignal } from '@builder.io/qwik';
-import { routeLoader$ } from '@builder.io/qwik-city';
-import Footer from '~/components/Footer';
-import Header from '~/components/Header';
-import { useLocalStorage } from '~/hooks/useLocalStorage';
+import type { Signal } from "@builder.io/qwik";
+import {
+  component$,
+  createContextId,
+  Slot,
+  useContextProvider,
+  useSignal,
+} from "@builder.io/qwik";
+import { routeLoader$ } from "@builder.io/qwik-city";
+import dayjs from "dayjs";
+import Footer from "~/components/Footer";
+import Header from "~/components/Header";
+import { useLocalStorage } from "~/hooks/useLocalStorage";
+import { prisma } from "~/utils/prisma";
+
+export const dateFormat = "DD/MM/YYYY";
 
 export const useServerTimeLoader = routeLoader$(() => {
   return {
@@ -11,13 +21,33 @@ export const useServerTimeLoader = routeLoader$(() => {
   };
 });
 
-export const LocalStorageNameContext = createContextId<Signal<string>>('localeStorageName');
-export const nameSignalContext = createContextId<Signal<string>>('nameSignalName');
+export const useGuessedWords = routeLoader$(async () => {
+  const word = await prisma.wordOfTheDay.findFirst({
+    where: {
+      dateCreated: dayjs().format(dateFormat),
+    },
+    include: {
+      guessWord: true,
+    },
+  });
+
+  return word?.guessWord;
+});
+
+export const LocalStorageNameContext = createContextId<{
+  initialLoad: Signal<boolean>;
+  localStorageName: Signal<string | null>;
+}>("localeStorageName");
+export const nameSignalContext =
+  createContextId<Signal<string>>("nameSignalName");
 
 export default component$(() => {
-  const testSingaL = useSignal('');
-  useContextProvider(LocalStorageNameContext, useLocalStorage(testSingaL, 'name'));
-  useContextProvider(nameSignalContext, testSingaL);
+  const testSignal = useSignal("");
+  useContextProvider(
+    LocalStorageNameContext,
+    useLocalStorage(testSignal, "name")
+  );
+  useContextProvider(nameSignalContext, testSignal);
 
   return (
     <>

@@ -1,19 +1,39 @@
-import { component$, useSignal } from '@builder.io/qwik';
-import type { DocumentHead } from '@builder.io/qwik-city';
-import { useLocation } from '@builder.io/qwik-city';
-import { routeLoader$ } from '@builder.io/qwik-city';
-import type { SimilarData } from '@prisma/client';
-import dayjs from 'dayjs';
-import PreviousAndNextDayLinks from '~/components/PreviousAndNextDayLinks';
-import VideoPlayer from '~/components/VideoPlayer';
-import WordOfTheDayDescription from '~/components/WordOfTheDayDescription';
-import WordOfTheDayTitle from '~/components/WordOfTheDayTitle';
-import WordSelectionButtons from '~/components/WordSelectionButtons';
-import type { TSPQuizResponse } from '~/types/tspquiz';
-import { prisma } from '~/utils/prisma';
+import { $, component$, useContext, useSignal } from "@builder.io/qwik";
+import type { DocumentHead } from "@builder.io/qwik-city";
+import { Link, server$, useLocation } from "@builder.io/qwik-city";
+import { routeLoader$ } from "@builder.io/qwik-city";
+import type { SimilarData } from "@prisma/client";
+import dayjs from "dayjs";
+import PreviousAndNextDayLinks from "~/components/PreviousAndNextDayLinks";
+import VideoPlayer from "~/components/VideoPlayer";
+import WordOfTheDayDescription from "~/components/WordOfTheDayDescription";
+import WordOfTheDayTitle from "~/components/WordOfTheDayTitle";
+import WordSelectionButtons from "~/components/WordSelectionButtons";
+import type { TSPQuizResponse } from "~/types/tspquiz";
+import { prisma } from "~/utils/prisma";
+import { LocalStorageNameContext, dateFormat, useGuessedWords } from "./layout";
 
-export const dateFormat = 'DD/MM/YYYY';
-export const apiString = 'https://tspquiz.se/api/';
+export const apiString = "https://tspquiz.se/api/";
+
+const makeTheGuess = server$(
+  async (
+    guess: string,
+    wordOfTheDay: string,
+    wordOfTheDayId: string,
+    name: string
+  ) => {
+    if (guess.toLowerCase() === wordOfTheDay.toLowerCase()) {
+      return await prisma.guessWord.create({
+        data: {
+          solvedBy: name,
+          wordOfTheDayId,
+        },
+      });
+    }
+
+    return "wrong";
+  }
+);
 
 export const useTodaysWord = routeLoader$(async () => {
   const word = await prisma.wordOfTheDay.findFirst({
@@ -26,7 +46,9 @@ export const useTodaysWord = routeLoader$(async () => {
   });
 
   if (!word) {
-    const res1 = await fetch(`${apiString}?action=random&count=1&excludeUncommon=1`);
+    const res1 = await fetch(
+      `${apiString}?action=random&count=1&excludeUncommon=1`
+    );
     const randomWord: TSPQuizResponse[] = await res1.json();
 
     const { id, word, description, movie, movie_image } = randomWord[0];
@@ -74,8 +96,12 @@ export const useTodaysWord = routeLoader$(async () => {
 
 export default component$(() => {
   const wordOfTheDay = useTodaysWord();
+  const guessWord = useGuessedWords();
   const selectedId = useSignal(0);
   const loc = useLocation();
+  const userGuess = useSignal("");
+  const guessedWrong = useSignal(false);
+  const nameInStorage = useContext(LocalStorageNameContext);
 
   if (loc.isNavigating) selectedId.value = 0;
 
@@ -87,37 +113,121 @@ export default component$(() => {
     );
   }
 
+  const userGuessesWord = $(async (wordGuesss: string) => {
+    if (wordGuesss === "") return;
+    const newGuesses = await makeTheGuess(
+      wordGuesss,
+      wordOfTheDay.value[0].word,
+      wordOfTheDay.value[0].wordOfTheDayId,
+      nameInStorage.localStorageName.value ?? ""
+    );
+    if (newGuesses === "wrong") {
+      guessedWrong.value = true;
+      userGuess.value = "";
+      return;
+    }
+
+    return location.reload();
+  });
+
+  const isNameInGuessedArray = guessWord.value?.some((obj) =>
+    Object.values(obj).some((value) =>
+      String(value).includes(nameInStorage.localStorageName.value ?? "")
+    )
+  );
+
+  const guessedTheWord =
+    guessWord.value && guessWord.value.length > 0 && isNameInGuessedArray;
+
+  if (!nameInStorage.initialLoad.value) return <></>;
+
+  if (nameInStorage.localStorageName.value === null) {
+    return (
+      <div class="flex justify-center mt-4">
+        <div class="flex flex-col">
+          <PreviousAndNextDayLinks />
+          <div class="flex flex-col mt-4 text-center">
+            <span>"Logga in" för att kunna gissa</span>
+            <div class="flex justify-center">
+              <Link
+                class="bg-gray-600 text-white rounded-full py-2 px-4 block"
+                href="/sign-in"
+              >
+                Logga in
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div class="flex flex-col justify-center items-center gap-4 px-4 md:p-0">
       <PreviousAndNextDayLinks />
-      <WordOfTheDayTitle
-        word={wordOfTheDay.value[selectedId.value].word}
-        signId={wordOfTheDay.value[selectedId.value].signId}
-      />
+      {guessedTheWord && (
+        <WordOfTheDayTitle
+          word={wordOfTheDay.value[selectedId.value].word}
+          signId={wordOfTheDay.value[selectedId.value].signId}
+        />
+      )}
       <VideoPlayer
         movieImage={wordOfTheDay.value[selectedId.value].movie_image}
         movie={wordOfTheDay.value[selectedId.value].movie}
       />
-      {wordOfTheDay.value.length > 1 && (
-        <WordSelectionButtons wordOfTheDay={wordOfTheDay.value} selectedId={selectedId} />
+      {guessedTheWord && wordOfTheDay.value.length > 1 && (
+        <WordSelectionButtons
+          wordOfTheDay={wordOfTheDay.value}
+          selectedId={selectedId}
+        />
       )}
-      <WordOfTheDayDescription description={wordOfTheDay.value[selectedId.value].description} />
+      {guessedTheWord && (
+        <WordOfTheDayDescription
+          description={wordOfTheDay.value[selectedId.value].description}
+        />
+      )}
+      {(guessWord.value !== undefined && guessWord.value.length === 0) ||
+        (!isNameInGuessedArray && (
+          <div class="flex flex-col">
+            <div class="flex items-center">
+              <input
+                value={userGuess.value}
+                onInput$={(ev) =>
+                  (userGuess.value = (ev.target as HTMLInputElement).value)
+                }
+                onKeyPress$={(e) => {
+                  if (e.key === "Enter") {
+                    userGuessesWord((e.target as HTMLInputElement).value);
+                  }
+                }}
+                type="text"
+                class="bg-gray-700 text-white rounded-full py-2 px-4 focus:outline-none sm:mb-0"
+              />
+              <button
+                class="bg-gray-600 text-white rounded-full py-2 px-4 ml-2"
+                onClick$={() => userGuessesWord(userGuess.value)}
+              >
+                Gissa
+              </button>
+            </div>
+            {guessedWrong.value && (
+              <div class="flex items-center">
+                <span class="text-red-700">Fel gissat</span>
+              </div>
+            )}
+          </div>
+        ))}
     </div>
   );
 });
 
-export const head: DocumentHead = ({ resolveValue }) => {
-  const word = resolveValue(useTodaysWord);
+export const head: DocumentHead = () => {
   return {
-    title: `Dagens Tecken "${word[0].word}"`,
+    title: `Dagens Tecken`,
     meta: [
       {
-        name: 'description',
-        content: word[0].description,
-      },
-      {
-        name: 'id',
-        content: word[0].id,
+        name: "description",
+        content: "Gissa Dagens tecken!",
       },
     ],
   };

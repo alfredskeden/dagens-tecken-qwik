@@ -21,6 +21,7 @@ model wordOfTheDay {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @default(now())
   similarDataId SimilarData[]
+  guessWord     GuessWord[]
 }
 
 model SimilarData {
@@ -34,4 +35,13 @@ model SimilarData {
   movie_image    String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now())
+}
+
+model GuessWord {
+  id              String        @id @default(uuid())
+  wordOfTheDay    wordOfTheDay  @relation(fields: [wordOfTheDayId], references: [id])
+  wordOfTheDayId  String
+  solvedBy        String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now())
 }
