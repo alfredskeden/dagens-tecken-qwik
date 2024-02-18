@@ -40,3 +40,7 @@ lerna-debug.log*
 
 # Prisma
 /prisma/dev.db
+
+#Codespaces
+.devcontainer
+.github
