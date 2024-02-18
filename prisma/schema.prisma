@@ -11,17 +11,18 @@ datasource db {
 }
 
 model wordOfTheDay {
-  id            String        @id @default(uuid())
-  signId        String
-  word          String
-  description   String
-  movie         String
-  movie_image   String
-  dateCreated   String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @default(now())
-  similarDataId SimilarData[]
-  guessWord     GuessWord[]
+  id             String           @id @default(uuid())
+  signId         String
+  word           String
+  description    String
+  movie          String
+  movie_image    String
+  dateCreated    String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @default(now())
+  similarDataId  SimilarData[]
+  wordsToCompare WordsToCompare[]
+  guessWord      GuessWord[]
 }
 
 model SimilarData {
@@ -37,11 +38,21 @@ model SimilarData {
   updatedAt      DateTime     @default(now())
 }
 
+model WordsToCompare {
+  id             String       @id @default(uuid())
+  wordOfTheDay   wordOfTheDay @relation(fields: [wordOfTheDayId], references: [id])
+  wordOfTheDayId String
+  signId         String
+  word           String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now())
+}
+
 model GuessWord {
-  id              String        @id @default(uuid())
-  wordOfTheDay    wordOfTheDay  @relation(fields: [wordOfTheDayId], references: [id])
-  wordOfTheDayId  String
-  solvedBy        String
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @default(now())
+  id             String       @id @default(uuid())
+  wordOfTheDay   wordOfTheDay @relation(fields: [wordOfTheDayId], references: [id])
+  wordOfTheDayId String
+  solvedBy       String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now())
 }

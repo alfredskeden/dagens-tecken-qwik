@@ -1,27 +1,21 @@
-import { $, component$, useContext, useSignal } from "@builder.io/qwik";
-import type { DocumentHead } from "@builder.io/qwik-city";
-import { Link, server$, useLocation } from "@builder.io/qwik-city";
-import { routeLoader$ } from "@builder.io/qwik-city";
-import type { SimilarData } from "@prisma/client";
-import dayjs from "dayjs";
-import PreviousAndNextDayLinks from "~/components/PreviousAndNextDayLinks";
-import VideoPlayer from "~/components/VideoPlayer";
-import WordOfTheDayDescription from "~/components/WordOfTheDayDescription";
-import WordOfTheDayTitle from "~/components/WordOfTheDayTitle";
-import WordSelectionButtons from "~/components/WordSelectionButtons";
-import type { TSPQuizResponse } from "~/types/tspquiz";
-import { prisma } from "~/utils/prisma";
-import { LocalStorageNameContext, dateFormat, useGuessedWords } from "./layout";
+import { $, component$, useContext, useSignal } from '@builder.io/qwik';
+import type { DocumentHead } from '@builder.io/qwik-city';
+import { Link, server$, useLocation } from '@builder.io/qwik-city';
+import { routeLoader$ } from '@builder.io/qwik-city';
+import dayjs from 'dayjs';
+import PreviousAndNextDayLinks from '~/components/PreviousAndNextDayLinks';
+import VideoPlayer from '~/components/VideoPlayer';
+import WordOfTheDayDescription from '~/components/WordOfTheDayDescription';
+import WordOfTheDayTitle from '~/components/WordOfTheDayTitle';
+import WordSelectionButtons from '~/components/WordSelectionButtons';
+import type { TSPQuizResponse } from '~/types/tspquiz';
+import { prisma } from '~/utils/prisma';
+import { LocalStorageNameContext, dateFormat, useGuessedWords } from './layout';
 
-export const apiString = "https://tspquiz.se/api/";
+export const apiString = 'https://tspquiz.se/api/';
 
 const makeTheGuess = server$(
-  async (
-    guess: string,
-    wordOfTheDay: string,
-    wordOfTheDayId: string,
-    name: string
-  ) => {
+  async (guess: string, wordOfTheDay: string, wordOfTheDayId: string, name: string) => {
     if (guess.toLowerCase() === wordOfTheDay.toLowerCase()) {
       return await prisma.guessWord.create({
         data: {
@@ -31,7 +25,7 @@ const makeTheGuess = server$(
       });
     }
 
-    return "wrong";
+    return 'wrong';
   }
 );
 
@@ -42,13 +36,12 @@ export const useTodaysWord = routeLoader$(async () => {
     },
     include: {
       similarDataId: true,
+      wordsToCompare: true,
     },
   });
 
   if (!word) {
-    const res1 = await fetch(
-      `${apiString}?action=random&count=1&excludeUncommon=1`
-    );
+    const res1 = await fetch(`${apiString}?action=random&count=1&excludeUncommon=1`);
     const randomWord: TSPQuizResponse[] = await res1.json();
 
     const { id, word, description, movie, movie_image } = randomWord[0];
@@ -71,11 +64,9 @@ export const useTodaysWord = routeLoader$(async () => {
     );
     const similarWords: TSPQuizResponse[] = await res2.json();
 
-    const similarData: SimilarData[] = [];
-
     for (const words of similarWords) {
       if (words.word === createdWord.word) {
-        const newSimilarWords = await prisma.similarData.create({
+        await prisma.similarData.create({
           data: {
             word: words.word,
             description: words.description,
@@ -85,13 +76,46 @@ export const useTodaysWord = routeLoader$(async () => {
             wordOfTheDayId: createdWord.id,
           },
         });
-        similarData.push(newSimilarWords);
       }
     }
-    return similarData;
+
+    const res3 = await fetch(`${apiString}?action=random&count=3&excludeUncommon=1`);
+    const randomWordsToGuess: TSPQuizResponse[] = await res3.json();
+
+    for (const words of randomWordsToGuess) {
+      await prisma.wordsToCompare.create({
+        data: {
+          word: words.word,
+          signId: words.id,
+          wordOfTheDayId: createdWord.id,
+        },
+      });
+    }
+
+    const newWord = await prisma.wordOfTheDay.findFirst({
+      where: {
+        dateCreated: dayjs().format(dateFormat),
+      },
+      include: {
+        similarDataId: true,
+        wordsToCompare: true,
+      },
+    });
+
+    return funcWordsToCompare(newWord);
   }
 
-  return word.similarDataId;
+  return funcWordsToCompare(word);
+});
+
+const funcWordsToCompare = server$((wordOfTheDay) => {
+  const wordsToCompare = wordOfTheDay.wordsToCompare.map((wordToCompare: any) => {
+    return wordToCompare.word;
+  });
+
+  wordsToCompare.splice(((wordsToCompare.length + 1) * Math.random()) | 0, 0, wordOfTheDay.word);
+
+  return { ...wordOfTheDay, wordsToCompare };
 });
 
 export default component$(() => {
@@ -99,13 +123,13 @@ export default component$(() => {
   const guessWord = useGuessedWords();
   const selectedId = useSignal(0);
   const loc = useLocation();
-  const userGuess = useSignal("");
+  const userGuess = useSignal('');
   const guessedWrong = useSignal(false);
   const nameInStorage = useContext(LocalStorageNameContext);
 
   if (loc.isNavigating) selectedId.value = 0;
 
-  if (wordOfTheDay.value.length <= 0) {
+  if (!wordOfTheDay.value) {
     return (
       <div class="flex justify-center h-screen mt-4">
         <h2 class="text-3xl">Try again</h2>
@@ -114,30 +138,29 @@ export default component$(() => {
   }
 
   const userGuessesWord = $(async (wordGuesss: string) => {
-    if (wordGuesss === "") return;
+    if (wordGuesss === '') return;
     const newGuesses = await makeTheGuess(
       wordGuesss,
-      wordOfTheDay.value[0].word,
-      wordOfTheDay.value[0].wordOfTheDayId,
-      nameInStorage.localStorageName.value ?? ""
+      wordOfTheDay.value.word,
+      wordOfTheDay.value.id,
+      nameInStorage.localStorageName.value ?? ''
     );
-    if (newGuesses === "wrong") {
+    if (newGuesses === 'wrong') {
       guessedWrong.value = true;
-      userGuess.value = "";
+      userGuess.value = '';
       return;
     }
 
     return location.reload();
   });
 
-  const isNameInGuessedArray = guessWord.value?.some((obj) =>
+  const isNameInGuessedArray = guessWord.value?.some((obj: any) =>
     Object.values(obj).some((value) =>
-      String(value).includes(nameInStorage.localStorageName.value ?? "")
+      String(value).includes(nameInStorage.localStorageName.value ?? '')
     )
   );
 
-  const guessedTheWord =
-    guessWord.value && guessWord.value.length > 0 && isNameInGuessedArray;
+  const guessedTheWord = guessWord.value && guessWord.value.length > 0 && isNameInGuessedArray;
 
   if (!nameInStorage.initialLoad.value) return <></>;
 
@@ -149,10 +172,7 @@ export default component$(() => {
           <div class="flex flex-col mt-4 text-center">
             <span>"Logga in" för att kunna gissa</span>
             <div class="flex justify-center">
-              <Link
-                class="bg-gray-600 text-white rounded-full py-2 px-4 block"
-                href="/sign-in"
-              >
+              <Link class="bg-gray-600 text-white rounded-full py-2 px-4 block" href="/sign-in">
                 Logga in
               </Link>
             </div>
@@ -167,51 +187,45 @@ export default component$(() => {
       <PreviousAndNextDayLinks />
       {guessedTheWord && (
         <WordOfTheDayTitle
-          word={wordOfTheDay.value[selectedId.value].word}
-          signId={wordOfTheDay.value[selectedId.value].signId}
+          word={wordOfTheDay.value.similarDataId[selectedId.value].word}
+          signId={wordOfTheDay.value.similarDataId[selectedId.value].signId}
         />
       )}
       <VideoPlayer
-        movieImage={wordOfTheDay.value[selectedId.value].movie_image}
-        movie={wordOfTheDay.value[selectedId.value].movie}
+        movieImage={wordOfTheDay.value.similarDataId[selectedId.value].movie_image}
+        movie={wordOfTheDay.value.similarDataId[selectedId.value].movie}
       />
-      {guessedTheWord && wordOfTheDay.value.length > 1 && (
+      {guessedTheWord && wordOfTheDay.value.similarDataId.length > 1 && (
         <WordSelectionButtons
-          wordOfTheDay={wordOfTheDay.value}
+          wordOfTheDay={wordOfTheDay.value.similarDataId}
           selectedId={selectedId}
         />
       )}
       {guessedTheWord && (
         <WordOfTheDayDescription
-          description={wordOfTheDay.value[selectedId.value].description}
+          description={wordOfTheDay.value.similarDataId[selectedId.value].description}
         />
       )}
       {!isNameInGuessedArray && (
-        <div class="flex flex-col">
-          <div class="flex items-center">
-            <input
-              value={userGuess.value}
-              onInput$={(ev) =>
-                (userGuess.value = (ev.target as HTMLInputElement).value)
-              }
-              onKeyPress$={(e) => {
-                if (e.key === "Enter") {
-                  userGuessesWord((e.target as HTMLInputElement).value);
-                }
-              }}
-              type="text"
-              class="bg-gray-700 text-white rounded-full py-2 px-4 focus:outline-none sm:mb-0"
-            />
-            <button
-              class="bg-gray-600 text-white rounded-full py-2 px-4 ml-2"
-              onClick$={() => userGuessesWord(userGuess.value)}
-            >
-              Gissa
-            </button>
+        <div class="flex flex-col gap-2">
+          <div class="grid grid-cols-4 items-center gap-7 mb-8 mt-4">
+            {wordOfTheDay.value.wordsToCompare.map((wordToCompare: string, index: number) => {
+              return (
+                <button
+                  key={wordToCompare}
+                  id={`default-radio-${index}`}
+                  value={wordToCompare}
+                  onClick$={() => userGuessesWord(wordToCompare)}
+                  class="bg-gray-600 text-white rounded-full py-2 px-4 block md:col-span-1 sm:col-span-2 col-span-4"
+                >
+                  {wordToCompare}
+                </button>
+              );
+            })}
           </div>
           {guessedWrong.value && (
-            <div class="flex items-center">
-              <span class="text-red-700">Fel gissat</span>
+            <div class="flex text-center">
+              <span class="text-red-700 font-bold">Fel gissat</span>
             </div>
           )}
         </div>
@@ -225,8 +239,8 @@ export const head: DocumentHead = () => {
     title: `Dagens Tecken`,
     meta: [
       {
-        name: "description",
-        content: "Gissa Dagens tecken!",
+        name: 'description',
+        content: 'Gissa Dagens tecken!',
       },
     ],
   };

@@ -1,0 +1,10 @@
+-- CreateTable
+CREATE TABLE "WordsToCompare" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "wordOfTheDayId" TEXT NOT NULL,
+    "signId" TEXT NOT NULL,
+    "word" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "WordsToCompare_wordOfTheDayId_fkey" FOREIGN KEY ("wordOfTheDayId") REFERENCES "wordOfTheDay" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
