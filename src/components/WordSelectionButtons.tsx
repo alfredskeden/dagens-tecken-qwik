@@ -15,25 +15,21 @@ export default component$(({ wordOfTheDay, selectedId }: Props) => {
   });
 
   return (
-    <div class="flex flex-wrap gap-4 justify-center">
+    <div class="grid grid-cols-4 items-center gap-7 mb-8 mt-4">
       {wordOfTheDay.map((wordOfTD: SimilarData, index: number) => (
         <button
           class={`${
             isItemSelected(index)
-              ? "bg-blue-500 text-white font-bold py-2 px-4 rounded opacity-50 cursor-not-allowed"
-              : "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"
+              ? " bg-gray-600 text-white rounded-full py-2 px-4 block md:col-span-1 sm:col-span-2 col-span-4 opacity-50 cursor-not-allowed"
+              : "bg-gray-600 text-white rounded-full py-2 px-4 block md:col-span-1 sm:col-span-2 col-span-4 hover:underline hover:border-white border border-transparent"
           }`}
           key={wordOfTD.id}
           disabled={isItemSelected(index)}
           onClick$={() => handleItemClick(index)}
         >
           <div class="flex gap-2 items-center">
-            {isItemSelected(index) && (
-              <MaterialSymbolsPlayCircleOutlineRounded />
-            )}
-            <span class={`${isItemSelected(index) ? "" : "ml-6"}`}>
-              {wordOfTD.word}
-            </span>
+            {isItemSelected(index) && <MaterialSymbolsPlayCircleOutlineRounded />}
+            <span class={`${isItemSelected(index) ? "" : "ml-6"}`}>{wordOfTD.word}</span>
           </div>
         </button>
       ))}

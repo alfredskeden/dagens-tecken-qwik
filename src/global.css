@@ -5,3 +5,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  color: white;
+  background-color: black;
+}
+
+.body-background {
+  background-image: radial-gradient(circle at center, rgb(255, 255, 255, 0.005) 0, rgb(255, 255, 255, 0.005) 1px, transparent 1px),
+    linear-gradient(to right, rgb(255, 255, 255, 0.01) 1px, transparent 1px), linear-gradient(to bottom, rgb(255, 255, 255, 0.01) 1px, transparent 1px);
+  background-size: 10px, 10px;
+  background-attachment: fixed;
+  background-color: #2c2c2c;
+}
