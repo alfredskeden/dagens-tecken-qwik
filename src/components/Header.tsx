@@ -30,7 +30,7 @@ export default component$(() => {
                 }
               }}
               type="text"
-              class="rounded-full focus:outline-none sm:mb-0 text-black"
+              class="rounded-full focus:outline-none sm:mb-0 text-black py-2 px-4"
             />
             <button
               class="rounded-full hover:underline"

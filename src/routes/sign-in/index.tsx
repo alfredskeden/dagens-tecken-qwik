@@ -25,7 +25,7 @@ export default component$(() => {
   return (
     <div class="flex justify-center mt-4">
       {!nameInStorage.localStorageName.value ? (
-        <div class="flex space-x-2">
+        <div class="flex gap-x-8">
           <input
             value={inputValue.value}
             onInput$={(ev) => (inputValue.value = (ev.target as HTMLInputElement).value)}
@@ -35,16 +35,16 @@ export default component$(() => {
               }
             }}
             type="text"
-            class="bg-gray-700 text-white rounded-full py-2 px-4 focus:outline-none sm:mb-0"
+            class="text-black rounded-full py-2 px-4 focus:outline sm:mb-0"
           />
-          <button class="bg-gray-600 text-white rounded-full py-2 px-4" onClick$={setNamedStorage}>
+          <button class="rounded-full hover:underline" onClick$={setNamedStorage}>
             Save
           </button>
         </div>
       ) : (
-        <div class="flex space-x-2">
+        <div class="flex gap-8">
           <span class="inline-block align-baseline text-3xl">{nameInStorage.localStorageName.value}</span>
-          <button class="bg-gray-600 text-white rounded-full py-2 px-4" onClick$={clearNamedStorage}>
+          <button class="rounded-full hover:underline" onClick$={clearNamedStorage}>
             Clear
           </button>
         </div>
