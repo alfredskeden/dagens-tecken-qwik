@@ -1,11 +1,5 @@
 import type { Signal } from "@builder.io/qwik";
-import {
-  component$,
-  createContextId,
-  Slot,
-  useContextProvider,
-  useSignal,
-} from "@builder.io/qwik";
+import { component$, createContextId, Slot, useContextProvider, useSignal } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import dayjs from "dayjs";
 import Footer from "~/components/Footer";
@@ -38,15 +32,11 @@ export const LocalStorageNameContext = createContextId<{
   initialLoad: Signal<boolean>;
   localStorageName: Signal<string | null>;
 }>("localeStorageName");
-export const nameSignalContext =
-  createContextId<Signal<string>>("nameSignalName");
+export const nameSignalContext = createContextId<Signal<string>>("nameSignalName");
 
 export default component$(() => {
   const testSignal = useSignal("");
-  useContextProvider(
-    LocalStorageNameContext,
-    useLocalStorage(testSignal, "name")
-  );
+  useContextProvider(LocalStorageNameContext, useLocalStorage(testSignal, "name"));
   useContextProvider(nameSignalContext, testSignal);
 
   return (

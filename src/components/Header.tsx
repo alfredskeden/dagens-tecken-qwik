@@ -17,7 +17,7 @@ export default component$(() => {
           </Link>
         </h1>
         <div class="flex flex-col sm:flex-row gap-y-2 sm:gap-y-0 gap-x-0 sm:gap-x-12 mt-2 sm:mt-0 items-center">
-          <Link class="rounded-full hover:underline" href={`/search/${encodeURI("A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Å Ä Ö")}`}>
+          <Link class="rounded-full hover:underline" href={`/search-sentence/${encodeURI("A B C D E F G H I J K L M N O P Q R S T U V W X Y Z Å Ä Ö")}`}>
             Alfabetet
           </Link>
           <div class="flex flex-row items-center space-x-6">

@@ -1,7 +1,6 @@
 import { Resource, component$, useResource$ } from "@builder.io/qwik";
 import type { DocumentHead } from "@builder.io/qwik-city";
-import { useNavigate } from "@builder.io/qwik-city";
-import { useLocation } from "@builder.io/qwik-city";
+import { useNavigate, useLocation } from "@builder.io/qwik-city";
 import Loading from "~/components/Loading";
 import VideoPlayer from "~/components/VideoPlayer";
 import WordOfTheDayDescription from "~/components/WordOfTheDayDescription";
@@ -16,11 +15,7 @@ export default component$(() => {
   const words = useResource$<TSPQuizResponse[]>(async ({ track }) => {
     track(() => loc.params.searchTerm);
 
-    const res2 = await fetch(
-      `${apiString}?action=all-by-word&word=${encodeURI(
-        loc.params.searchTerm,
-      )}&flexible_match=1&max_count=10&excludeUncommon=1`,
-    );
+    const res2 = await fetch(`${apiString}?action=all-by-word&word=${encodeURI(loc.params.searchTerm)}&flexible_match=1&max_count=10&excludeUncommon=1`);
     const words: TSPQuizResponse[] = await res2.json();
     if ((!words || !words.length) && loc.params.searchTerm) {
       nav(`/search-sentence/${loc.params.searchTerm}`);
@@ -47,10 +42,7 @@ export default component$(() => {
               return (
                 <div key={word.id} class="flex flex-col items-center gap-4">
                   <WordOfTheDayTitle word={word.word} signId={word.id} />
-                  <VideoPlayer
-                    movieImage={word.movie_image}
-                    movie={word.movie}
-                  />
+                  <VideoPlayer movieImage={word.movie_image} movie={word.movie} />
                   <WordOfTheDayDescription description={word.description} />
                 </div>
               );

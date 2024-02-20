@@ -20,7 +20,7 @@ export default component$(({ wordOfTheDay, selectedId }: Props) => {
         <button
           class={`${
             isItemSelected(index)
-              ? " bg-gray-600 text-white rounded-full py-2 px-4 block md:col-span-1 sm:col-span-2 col-span-4 opacity-50 cursor-not-allowed"
+              ? "bg-gray-600 text-white rounded-full py-2 px-4 block md:col-span-1 sm:col-span-2 col-span-4 opacity-50 cursor-not-allowed"
               : "bg-gray-600 text-white rounded-full py-2 px-4 block md:col-span-1 sm:col-span-2 col-span-4 hover:underline hover:border-white border border-transparent"
           }`}
           key={wordOfTD.id}

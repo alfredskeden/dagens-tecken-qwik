@@ -1,12 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/web-manifest-combined.json",
-  "name": "Dagens Tecken!",
+  "name": "Dagens tecken",
   "short_name": "DT",
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#1F2937",
+  "theme_color": "#2E2E2E",
   "background_color": "#fff",
-  "description": "Sök och lär dig teckenspråk med hjälp av denna snabba app.",
+  "description": "Sök och lär dig teckenspråk med hjälp av denna app.",
   "icons": [
     {
       "src": "logo-192-192.png",
