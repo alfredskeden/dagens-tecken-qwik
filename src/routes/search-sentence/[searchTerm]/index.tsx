@@ -15,11 +15,7 @@ export const useSentenceBuilder = routeLoader$(async ({ params }) => {
   const sentenceArray: TSPQuizResponse[] = [];
 
   for (const searchWords of splitSearchTerm) {
-    const res2 = await fetch(
-      `${apiString}?action=all-by-word&word=${encodeURI(
-        searchWords,
-      )}&flexible_match=0&max_count=1&excludeUncommon=0`,
-    );
+    const res2 = await fetch(`${apiString}?action=all-by-word&word=${encodeURI(searchWords)}&flexible_match=0&max_count=1&excludeUncommon=0`);
     const words: TSPQuizResponse[] = await res2.json();
 
     if (words.length > 0) {
@@ -63,12 +59,7 @@ export default component$(() => {
                   return null;
                 }
                 return (
-                  <WordOfTheDayTitle
-                    key={`${sentenceWord.id}-${index}`}
-                    word={sentenceWord.word}
-                    signId={sentenceWord.id}
-                    underline={index === currentPlayingId.value}
-                  />
+                  <WordOfTheDayTitle key={sentenceWord.id} word={sentenceWord.word} signId={sentenceWord.id} underline={index === currentPlayingId.value} />
                 );
               })}
             </div>
@@ -77,11 +68,7 @@ export default component$(() => {
               movie={sentenceWords[currentPlayingId.value].movie}
               loop={false}
               controls={false}
-              onEnded={
-                currentPlayingId.value + 1 != sentenceWords.length
-                  ? movieEnded
-                  : resetSelectedId
-              }
+              onEnded={currentPlayingId.value + 1 != sentenceWords.length ? movieEnded : resetSelectedId}
             />
           </div>
         );
