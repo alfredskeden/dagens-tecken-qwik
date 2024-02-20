@@ -12,7 +12,7 @@ export default component$(() => {
     <header>
       <div class="container mx-auto px-4 py-6 flex flex-col sm:flex-row justify-between items-center">
         <h1 class="flex text-4xl font-bold align-middle mb-2 sm:mb-0">
-          <Link href="/" class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-green-300 to-yellow-400">
+          <Link href="/" class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-green-300 to-yellow-300">
             Dagens tecken
           </Link>
         </h1>
