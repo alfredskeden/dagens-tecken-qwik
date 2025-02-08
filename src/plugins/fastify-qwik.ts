@@ -13,10 +13,7 @@ export interface FastifyQwikOptions {
 
 const { router, notFound } = createQwikCity({ render, qwikCityPlan });
 
-const qwikPlugin: FastifyPluginAsync<FastifyQwikOptions> = async (
-  fastify,
-  options,
-) => {
+const qwikPlugin: FastifyPluginAsync<FastifyQwikOptions> = async (fastify, options) => {
   const { buildDir, distDir } = options;
 
   fastify.register(fastifyStatic, {
@@ -34,8 +31,17 @@ const qwikPlugin: FastifyPluginAsync<FastifyQwikOptions> = async (
   });
 
   fastify.setNotFoundHandler(async (request, response) => {
-    await router(request.raw, response.raw, fastify.log.error);
-    await notFound(request.raw, response.raw, fastify.log.error);
+    try {
+      await router(request.raw, response.raw, (err) => {
+        fastify.log.error({ err }, "Router error occurred");
+      });
+      await notFound(request.raw, response.raw, (err) => {
+        fastify.log.error({ err }, "Not found error occurred");
+      });
+    } catch (error) {
+      fastify.log.error({ error }, "Unexpected error in request handling");
+      response.status(500).send({ error: "Internal Server Error" });
+    }
   });
 };
 
