@@ -19,7 +19,19 @@ export const apiString = "https://tspquiz.se/api/";
 const fetchWithRetry = async (url: string, maxRetries = 3, delay = 1000) => {
   for (let i = 0; i < maxRetries; i++) {
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept-Language": "en-US,en;q=0.9",
+          Referer: "https://tspquiz.se/",
+          Origin: "https://tspquiz.se",
+        },
+      });
+
+      // Log the raw response text
+      const responseText = await response.text();
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -29,7 +41,13 @@ const fetchWithRetry = async (url: string, maxRetries = 3, delay = 1000) => {
         throw new Error(`Invalid content type: ${contentType}`);
       }
 
-      return await response.json();
+      // Parse the text to JSON after we've logged it
+      try {
+        return JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("JSON Parse Error:", parseError);
+        throw new Error(`Failed to parse JSON: ${responseText.substring(0, 200)}...`);
+      }
     } catch (error) {
       console.error(`Attempt ${i + 1} failed:`, error);
       if (i === maxRetries - 1) throw error;
