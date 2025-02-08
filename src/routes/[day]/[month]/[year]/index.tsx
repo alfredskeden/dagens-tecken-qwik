@@ -16,6 +16,28 @@ import { prisma } from "~/utils/prisma";
 
 export const apiString = "https://tspquiz.se/api/";
 
+const fetchWithRetry = async (url: string, maxRetries = 3, delay = 1000) => {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        throw new Error(`Invalid content type: ${contentType}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error(`Attempt ${i + 1} failed:`, error);
+      if (i === maxRetries - 1) throw error;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+};
+
 export const useTodaysWord = routeLoader$(async (requestEvent) => {
   const dateCreated = `${requestEvent.params.day}/${requestEvent.params.month}/${requestEvent.params.year}`;
   if (dayjs(`${requestEvent.params.year}-${requestEvent.params.month}-${requestEvent.params.day}`).diff(dayjs()) > 0) {
@@ -33,19 +55,7 @@ export const useTodaysWord = routeLoader$(async (requestEvent) => {
 
   if (!word) {
     try {
-      const res1 = await fetch(`${apiString}?action=random&count=1`);
-      if (!res1.ok) {
-        console.error(`API error: ${res1.status} ${res1.statusText}`);
-        return [{ ...futureData }];
-      }
-
-      const contentType = res1.headers.get("content-type");
-      if (!contentType?.includes("application/json")) {
-        console.error(`Invalid content type: ${contentType}`);
-        return [{ ...futureData }];
-      }
-
-      const randomWord: TSPQuizResponse[] = await res1.json();
+      const randomWord: TSPQuizResponse[] = await fetchWithRetry(`${apiString}?action=random&count=1`);
 
       if (!randomWord?.[0]?.movie_image) {
         console.error("Missing movie_image in API response");
@@ -66,13 +76,10 @@ export const useTodaysWord = routeLoader$(async (requestEvent) => {
       });
 
       try {
-        const res2 = await fetch(`${apiString}?action=all-by-word&word=${encodeURI(createdWord.word)}&flexible_match=1&max_count=30&excludeUncommon=0`);
-        if (!res2.ok) {
-          console.error(`Similar words API error: ${res2.status} ${res2.statusText}`);
-          return [{ ...futureData }];
-        }
+        const similarWords: TSPQuizResponse[] = await fetchWithRetry(
+          `${apiString}?action=all-by-word&word=${encodeURI(createdWord.word)}&flexible_match=1&max_count=30&excludeUncommon=0`
+        );
 
-        const similarWords: TSPQuizResponse[] = await res2.json();
         const similarData: SimilarData[] = [];
 
         for (const words of similarWords) {
