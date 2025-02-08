@@ -18,11 +18,7 @@ export const apiString = "https://tspquiz.se/api/";
 
 export const useTodaysWord = routeLoader$(async (requestEvent) => {
   const dateCreated = `${requestEvent.params.day}/${requestEvent.params.month}/${requestEvent.params.year}`;
-  if (
-    dayjs(
-      `${requestEvent.params.year}-${requestEvent.params.month}-${requestEvent.params.day}`
-    ).diff(dayjs()) > 0
-  ) {
+  if (dayjs(`${requestEvent.params.year}-${requestEvent.params.month}-${requestEvent.params.day}`).diff(dayjs()) > 0) {
     return [{ ...futureData }];
   }
 
@@ -39,44 +35,50 @@ export const useTodaysWord = routeLoader$(async (requestEvent) => {
     const res1 = await fetch(`${apiString}?action=random&count=1`);
     const randomWord: TSPQuizResponse[] = await res1.json();
 
+    if (!randomWord?.[0]?.movie_image) {
+      console.error("Missing movie_image in API response, retrying...");
+      return [{ ...futureData }];
+    }
+
     const { id, word, description, movie, movie_image } = randomWord[0];
 
-    const createdWord = await prisma.wordOfTheDay.create({
-      data: {
-        dateCreated,
-        word,
-        description,
-        movie,
-        movie_image,
-        signId: id,
-      },
-    });
+    try {
+      const createdWord = await prisma.wordOfTheDay.create({
+        data: {
+          dateCreated,
+          word,
+          description,
+          movie,
+          movie_image,
+          signId: id,
+        },
+      });
 
-    const res2 = await fetch(
-      `${apiString}?action=all-by-word&word=${encodeURI(
-        createdWord.word
-      )}&flexible_match=1&max_count=30&excludeUncommon=0`
-    );
-    const similarWords: TSPQuizResponse[] = await res2.json();
+      const res2 = await fetch(`${apiString}?action=all-by-word&word=${encodeURI(createdWord.word)}&flexible_match=1&max_count=30&excludeUncommon=0`);
+      const similarWords: TSPQuizResponse[] = await res2.json();
 
-    const similarData: SimilarData[] = [];
+      const similarData: SimilarData[] = [];
 
-    for (const words of similarWords) {
-      if (words.word === createdWord.word) {
-        const newSimilarWords = await prisma.similarData.create({
-          data: {
-            word: words.word,
-            description: words.description,
-            movie: words.movie,
-            movie_image: words.movie_image,
-            signId: words.id,
-            wordOfTheDayId: createdWord.id,
-          },
-        });
-        similarData.push(newSimilarWords);
+      for (const words of similarWords) {
+        if (words.word === createdWord.word) {
+          const newSimilarWords = await prisma.similarData.create({
+            data: {
+              word: words.word,
+              description: words.description,
+              movie: words.movie,
+              movie_image: words.movie_image,
+              signId: words.id,
+              wordOfTheDayId: createdWord.id,
+            },
+          });
+          similarData.push(newSimilarWords);
+        }
       }
+      return similarData;
+    } catch (error) {
+      console.error("Error creating word:", error);
+      return [{ ...futureData }];
     }
-    return similarData;
   }
 
   return word.similarDataId;
@@ -99,26 +101,13 @@ export default component$(() => {
     );
 
   return (
-    <div class="flex flex-col justify-center items-center gap-4 px-4 md:p-0">
-      <div class="flex flex-col justify-center items-center gap-4 px-4 md:p-0">
+    <div class="flex flex-col gap-4 justify-center items-center px-4 md:p-0">
+      <div class="flex flex-col gap-4 justify-center items-center px-4 md:p-0">
         <PreviousAndNextDayLinks />
-        <WordOfTheDayTitle
-          word={wordOfTheDay.value[selectedId.value].word}
-          signId={wordOfTheDay.value[selectedId.value].signId}
-        />
-        <VideoPlayer
-          movie={wordOfTheDay.value[selectedId.value].movie}
-          movieImage={wordOfTheDay.value[selectedId.value].movie_image}
-        />
-        {wordOfTheDay.value.length > 1 && (
-          <WordSelectionButtons
-            wordOfTheDay={wordOfTheDay.value}
-            selectedId={selectedId}
-          />
-        )}
-        <WordOfTheDayDescription
-          description={wordOfTheDay.value[selectedId.value].description}
-        />
+        <WordOfTheDayTitle word={wordOfTheDay.value[selectedId.value].word} signId={wordOfTheDay.value[selectedId.value].signId} />
+        <VideoPlayer movie={wordOfTheDay.value[selectedId.value].movie} movieImage={wordOfTheDay.value[selectedId.value].movie_image} />
+        {wordOfTheDay.value.length > 1 && <WordSelectionButtons wordOfTheDay={wordOfTheDay.value} selectedId={selectedId} />}
+        <WordOfTheDayDescription description={wordOfTheDay.value[selectedId.value].description} />
       </div>
     </div>
   );
