@@ -32,17 +32,28 @@ export const useTodaysWord = routeLoader$(async (requestEvent) => {
   });
 
   if (!word) {
-    const res1 = await fetch(`${apiString}?action=random&count=1`);
-    const randomWord: TSPQuizResponse[] = await res1.json();
-
-    if (!randomWord?.[0]?.movie_image) {
-      console.error("Missing movie_image in API response, retrying...");
-      return [{ ...futureData }];
-    }
-
-    const { id, word, description, movie, movie_image } = randomWord[0];
-
     try {
+      const res1 = await fetch(`${apiString}?action=random&count=1`);
+      if (!res1.ok) {
+        console.error(`API error: ${res1.status} ${res1.statusText}`);
+        return [{ ...futureData }];
+      }
+
+      const contentType = res1.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        console.error(`Invalid content type: ${contentType}`);
+        return [{ ...futureData }];
+      }
+
+      const randomWord: TSPQuizResponse[] = await res1.json();
+
+      if (!randomWord?.[0]?.movie_image) {
+        console.error("Missing movie_image in API response");
+        return [{ ...futureData }];
+      }
+
+      const { id, word, description, movie, movie_image } = randomWord[0];
+
       const createdWord = await prisma.wordOfTheDay.create({
         data: {
           dateCreated,
@@ -54,29 +65,38 @@ export const useTodaysWord = routeLoader$(async (requestEvent) => {
         },
       });
 
-      const res2 = await fetch(`${apiString}?action=all-by-word&word=${encodeURI(createdWord.word)}&flexible_match=1&max_count=30&excludeUncommon=0`);
-      const similarWords: TSPQuizResponse[] = await res2.json();
-
-      const similarData: SimilarData[] = [];
-
-      for (const words of similarWords) {
-        if (words.word === createdWord.word) {
-          const newSimilarWords = await prisma.similarData.create({
-            data: {
-              word: words.word,
-              description: words.description,
-              movie: words.movie,
-              movie_image: words.movie_image,
-              signId: words.id,
-              wordOfTheDayId: createdWord.id,
-            },
-          });
-          similarData.push(newSimilarWords);
+      try {
+        const res2 = await fetch(`${apiString}?action=all-by-word&word=${encodeURI(createdWord.word)}&flexible_match=1&max_count=30&excludeUncommon=0`);
+        if (!res2.ok) {
+          console.error(`Similar words API error: ${res2.status} ${res2.statusText}`);
+          return [{ ...futureData }];
         }
+
+        const similarWords: TSPQuizResponse[] = await res2.json();
+        const similarData: SimilarData[] = [];
+
+        for (const words of similarWords) {
+          if (words.word === createdWord.word) {
+            const newSimilarWords = await prisma.similarData.create({
+              data: {
+                word: words.word,
+                description: words.description,
+                movie: words.movie,
+                movie_image: words.movie_image,
+                signId: words.id,
+                wordOfTheDayId: createdWord.id,
+              },
+            });
+            similarData.push(newSimilarWords);
+          }
+        }
+        return similarData;
+      } catch (error) {
+        console.error("Error fetching similar words:", error);
+        return [{ ...futureData }];
       }
-      return similarData;
     } catch (error) {
-      console.error("Error creating word:", error);
+      console.error("Error fetching random word:", error);
       return [{ ...futureData }];
     }
   }
